@@ -5,6 +5,7 @@ from fastapi.responses import FileResponse
 from utils.filler import fill_placeholders
 import json
 from ast import literal_eval
+from utils.conversation import handle_conversational_turn
 
 import tempfile
 
@@ -13,7 +14,7 @@ app = FastAPI(title="Lexsy AI Backend")
 # Allow Streamlit frontend to call this API
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # tighten later
+    allow_origins=["*"], 
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -69,4 +70,29 @@ async def fill_doc(
 
     except Exception as e:
         print("❌ Error in /fill_doc:", e)
+        raise HTTPException(status_code=500, detail=str(e))
+    
+
+@app.post("/chat_fill")
+async def chat_fill(
+    placeholder: str = Form(...),
+    context: str = Form(...),
+    user_input: str = Form(""),
+    previous_global_value: str | None = Form(None),
+    prior_occurrence_value: str | None = Form(None),
+):
+    """
+    LLM-powered conversational endpoint:
+    Returns action: reuse | fill | ask, plus filled_value/followup_question.
+    """
+    try:
+        result = handle_conversational_turn(
+            placeholder_label=placeholder,
+            occurrence_context=context,
+            user_input=user_input,
+            previous_global_value=previous_global_value,
+            prior_occurrence_value=prior_occurrence_value
+        )
+        return result
+    except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
