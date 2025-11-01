@@ -576,12 +576,17 @@ if all_filled or st.session_state.review_mode:
                         "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
                     )
                 }
-                # Maintain ordered placeholder→value mapping
-                filled_map = {
-                    occ["label"]: st.session_state.responses_occurrence.get(occ["id"], "")
+                # Send ordered list of occurrences with their values to preserve order
+                # This ensures each placeholder (even with same label) gets its unique value
+                ordered_responses = [
+                    {
+                        "id": occ["id"],
+                        "label": occ["label"],
+                        "value": st.session_state.responses_occurrence.get(occ["id"], "")
+                    }
                     for occ in st.session_state.occurrences
-                }
-                data = {"responses": json.dumps(filled_map)}
+                ]
+                data = {"responses": json.dumps(ordered_responses)}
                 
                 try:
                     res = requests.post(f"{BACKEND_URL}/fill_doc", files=files, data=data, timeout=120)

@@ -42,6 +42,7 @@ async def fill_doc(file: UploadFile = File(...), responses: str = Form(...)):
         except Exception:
             data = literal_eval(responses)
         content = await file.read()
+        # data can be either list (ordered) or dict (legacy)
         output_path = fill_placeholders(content, data)
         return FileResponse(
             output_path,
