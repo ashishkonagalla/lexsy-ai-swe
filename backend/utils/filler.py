@@ -17,25 +17,48 @@ def fill_placeholders(file_bytes: bytes, responses: dict):
     print("✅ Document loaded successfully.")
 
     def replace_in_paragraph(paragraph):
-        """Replace only bracketed placeholders, ignoring normal words."""
+        """Replace placeholders including [KEY], {{KEY}}, $[____], and underline blanks."""
         full_text = "".join(run.text for run in paragraph.runs)
         replaced_text = full_text
 
-        # Replace only [PLACEHOLDER] or {{PLACEHOLDER}} patterns
+        # --- 1️⃣ Normal bracketed placeholders ---
         for key, value in responses.items():
-            patterns = [
-                rf"\[\s*{re.escape(key)}\s*\]",  # [Company Name]
-                rf"\{{\s*{re.escape(key)}\s*\}}",  # {Company Name}
-            ]
-            for pattern in patterns:
-                if re.search(pattern, replaced_text, flags=re.IGNORECASE):
-                    replaced_text = re.sub(pattern, value, replaced_text, flags=re.IGNORECASE)
-                    print(f"🔁 Replacing placeholder '{key}' with '{value}'")
+            if key not in ("$[__________]", "_____________"):
+                patterns = [
+                    rf"\[\s*{re.escape(key)}\s*\]",   # [KEY]
+                    rf"\{{\s*{re.escape(key)}\s*\}}", # {KEY}
+                ]
+                for pattern in patterns:
+                    if re.search(pattern, replaced_text, flags=re.IGNORECASE):
+                        replaced_text = re.sub(pattern, str(value), replaced_text, flags=re.IGNORECASE)
+                        print(f"🔁 Replacing placeholder '{key}' with '{value}'")
 
+        # --- 2️⃣ Money placeholders: $[__________] ---
+        money_value = responses.get("$[__________]")
+        if money_value:
+            if re.search(r"\$\s*\[[^\]]+\]", replaced_text):
+                replaced_text = re.sub(
+                    r"\$\s*\[[^\]]+\]",
+                    f"${money_value}",
+                    replaced_text
+                )
+                print(f"💰 Replacing money placeholder with '${money_value}'")
+
+        # --- 3️⃣ Underline blanks: ___________ ---
+        underline_value = responses.get("_____________")
+        if underline_value:
+            if re.search(r"_{3,}", replaced_text):
+                replaced_text = re.sub(r"_{3,}", str(underline_value), replaced_text)
+                print(f"🖊️ Replacing underline blanks with '{underline_value}'")
+
+        # --- 4️⃣ Write back to paragraph runs ---
         if full_text != replaced_text:
             for run in paragraph.runs:
                 run.text = ""
-            paragraph.runs[0].text = replaced_text
+            if paragraph.runs:
+                paragraph.runs[0].text = replaced_text
+            else:
+                paragraph.add_run(replaced_text)
 
     def process_element(element):
         """Recursively process all paragraphs and tables."""
@@ -63,4 +86,5 @@ def fill_placeholders(file_bytes: bytes, responses: dict):
     doc.save(output_path)
     print(f"✅ Document saved successfully at: {output_path}")
     print("==============================\n")
+
     return output_path
