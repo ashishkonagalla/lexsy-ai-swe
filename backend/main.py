@@ -60,7 +60,7 @@ async def chat_fill(
     user_input: str = Form(""),
     previous_global_value: str | None = Form(None),
     prior_occurrence_value: str | None = Form(None),
-    authorization: str | None = Header(None),
+    authorization: str | None = Header(default=None),
 ):
     """
     LLM-powered conversational endpoint.

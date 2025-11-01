@@ -234,13 +234,7 @@ if st.session_state.get("extraction_button_clicked", False) and uploaded_file:
             )
         }
         try:
-            res = send_request_with_auth("chat_fill", data={
-                "placeholder": label,
-                "context": "",
-                "user_input": "",
-                "previous_global_value": "",
-                "prior_occurrence_value": "",
-            }, timeout=60)
+            res = send_request_with_auth("parse_doc", files=files, timeout=60)
             if res.ok:
                 data = res.json()
                 
@@ -286,8 +280,8 @@ if st.session_state.extraction_complete and st.session_state.occurrences and not
                 prev_occ = st.session_state.responses_occurrence.get(occ_id, "")
                 
                 try:
-                    init = requests.post(
-                        f"{BACKEND_URL}/chat_fill",
+                    init = send_request_with_auth(
+                        "chat_fill",
                         data={
                             "placeholder": label,
                             "context": context,
@@ -494,8 +488,8 @@ if st.session_state.extraction_complete and st.session_state.occurrences and not
                     prev_occ = st.session_state.responses_occurrence.get(occ_id, "")
                     
                     try:
-                        res = requests.post(
-                            f"{BACKEND_URL}/chat_fill",
+                        res = send_request_with_auth(
+                            "chat_fill",
                             data={
                                 "placeholder": label,
                                 "context": context,

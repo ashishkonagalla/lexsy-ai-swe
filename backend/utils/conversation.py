@@ -3,7 +3,7 @@ from openai import OpenAI
 import json
 import os
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+# Note: Global client is not used - each function call creates its own client with the provided api_key
 
 SYSTEM_PROMPT = """
 You are a legal document assistant filling placeholders in uploaded contracts.
