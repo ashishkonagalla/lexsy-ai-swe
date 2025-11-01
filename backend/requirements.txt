@@ -2,4 +2,5 @@ fastapi
 uvicorn
 python-docx
 pydantic
+python-multipart
 openai>=1.12.0
