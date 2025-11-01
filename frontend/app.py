@@ -155,7 +155,7 @@ st.markdown('<p class="sub-header">Intelligent Legal Document Assistant</p>', un
 st.markdown("---")
 
 # --- Backend URL ---
-BACKEND_URL = "http://127.0.0.1:8000" 
+BACKEND_URL = "https://lexsy-ai-swe-backend.onrender.com"
 
 # --- Initialize session state ---
 st.session_state.setdefault("placeholders", [])
