@@ -149,13 +149,38 @@ def validate_input(label: str, value: str, question: str = "") -> tuple[bool, st
 # --- Streamlit Page Config ---
 st.set_page_config(page_title="Lexsy Legal Assistant", page_icon="⚖️", layout="wide")
 
+
+# ------------------- API KEY INPUT SECTION -------------------
+st.sidebar.header("🔑 OpenAI API Key")
+st.sidebar.markdown(
+    "To use the intelligent placeholder assistant, please enter your **OpenAI API key** below. "
+    "It will be used temporarily during this session and **not stored anywhere**."
+)
+
+user_api_key = st.sidebar.text_input("Enter your OpenAI API Key", type="password")
+if user_api_key:
+    st.session_state["api_key"] = user_api_key
+    st.sidebar.success("✅ Key saved for this session.")
+else:
+    st.sidebar.warning("⚠️ You can still use the parsing and filling, but AI features require a key.")
+
+
 # Header Section
 st.markdown('<h1 class="main-header">⚖️ Lexsy AI</h1>', unsafe_allow_html=True)
 st.markdown('<p class="sub-header">Intelligent Legal Document Assistant</p>', unsafe_allow_html=True)
 st.markdown("---")
 
 # --- Backend URL ---
-BACKEND_URL = "https://lexsy-ai-swe-backend.onrender.com"
+BACKEND_URL = "https://lexsy-ai-swe-backend.onrender.com" 
+
+def send_request_with_auth(endpoint, **kwargs):
+    """Helper to attach API key if available."""
+    headers = {}
+    if "api_key" in st.session_state:
+        headers["Authorization"] = f"Bearer {st.session_state['api_key']}"
+    return requests.post(f"{BACKEND_URL}/{endpoint}", headers=headers, **kwargs)
+
+
 
 # --- Initialize session state ---
 st.session_state.setdefault("placeholders", [])
@@ -209,7 +234,13 @@ if st.session_state.get("extraction_button_clicked", False) and uploaded_file:
             )
         }
         try:
-            res = requests.post(f"{BACKEND_URL}/parse_doc", files=files, timeout=60)
+            res = send_request_with_auth("chat_fill", data={
+                "placeholder": label,
+                "context": "",
+                "user_input": "",
+                "previous_global_value": "",
+                "prior_occurrence_value": "",
+            }, timeout=60)
             if res.ok:
                 data = res.json()
                 

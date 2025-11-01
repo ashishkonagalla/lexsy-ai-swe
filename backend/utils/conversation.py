@@ -43,13 +43,17 @@ def handle_conversational_turn(
     user_input: str = "",
     previous_global_value: str | None = None,
     prior_occurrence_value: str | None = None,
+    api_key: str | None = None,
 ):
+
+    client = OpenAI(api_key=api_key)
+
     payload = {
         "placeholder_label": placeholder_label,
         "occurrence_context": occurrence_context,
         "previous_global_value": previous_global_value or "",
         "prior_occurrence_value": prior_occurrence_value or "",
-        "user_input": user_input or ""
+        "user_input": user_input or "",
     }
 
     try:
