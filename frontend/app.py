@@ -147,10 +147,11 @@ def validate_input(label: str, value: str, question: str = "") -> tuple[bool, st
 
 
 # --- Streamlit Page Config ---
-st.set_page_config(page_title="Lexsy Legal Assistant", page_icon="⚖️", layout="wide")
+st.set_page_config(page_title="Lexsy Legal Assistant", page_icon="⚖️", layout="wide", initial_sidebar_state="expanded")
 
 
-# ------------------- API KEY INPUT SECTION -------------------
+# ------------------- SIDEBAR -------------------
+# API KEY INPUT SECTION
 st.sidebar.header("🔑 OpenAI API Key")
 st.sidebar.markdown(
     "To use the intelligent placeholder assistant, please enter your **OpenAI API key** below. "
@@ -167,11 +168,62 @@ else:
 
 # Header Section
 st.markdown('<h1 class="main-header">⚖️ Lexsy AI</h1>', unsafe_allow_html=True)
-st.markdown('<p class="sub-header">Intelligent Legal Document Assistant</p>', unsafe_allow_html=True)
+st.markdown('<p class="sub-header">Transform the way you prepare legal documents — from placeholder to polished in minutes</p>', unsafe_allow_html=True)
+
+# Service Introduction Section
+st.markdown("""
+<div style="text-align: center; padding: 1rem 0 2rem 0; max-width: 800px; margin: 0 auto;">
+    <p style="font-size: 1.1rem; color: #666; line-height: 1.6;">
+        Streamline your document workflow with AI.
+        Upload your draft, let Lexsy detect placeholders, and fill them conversationally with smart validation — while keeping your original format intact.
+    </p>
+</div>
+""", unsafe_allow_html=True)
+
+# Feature Highlights
+col1, col2, col3, col4 = st.columns(4)
+
+with col1:
+    st.markdown("""
+    <div style="text-align: center; padding: 1rem; background-color: #f8f9fa; border-radius: 10px; height: 150px;">
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;">🤖</div>
+        <div style="font-weight: 600; color: #1f4e79; margin-bottom: 0.25rem;">AI-Powered Detection</div>
+        <div style="font-size: 0.9rem; color: #666;">Automatically identifies placeholders</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col2:
+    st.markdown("""
+    <div style="text-align: center; padding: 1rem; background-color: #f8f9fa; border-radius: 10px; height: 150px;">
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;">💬</div>
+        <div style="font-weight: 600; color: #1f4e79; margin-bottom: 0.25rem;">Natural Conversation</div>
+        <div style="font-size: 0.9rem; color: #666;">Intuitive form interface</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col3:
+    st.markdown("""
+    <div style="text-align: center; padding: 1rem; background-color: #f8f9fa; border-radius: 10px; height: 150px;">
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;">✅</div>
+        <div style="font-weight: 600; color: #1f4e79; margin-bottom: 0.25rem;">Smart Validation</div>
+        <div style="font-size: 0.9rem; color: #666;">Real-time input validation</div>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col4:
+    st.markdown("""
+    <div style="text-align: center; padding: 1rem; background-color: #f8f9fa; border-radius: 10px; height: 150px;">
+        <div style="font-size: 2rem; margin-bottom: 0.5rem;">📄</div>
+        <div style="font-weight: 600; color: #1f4e79; margin-bottom: 0.25rem;">Format Preservation</div>
+        <div style="font-size: 0.9rem; color: #666;">Maintains original .docx styling</div>
+    </div>
+    """, unsafe_allow_html=True)
+
 st.markdown("---")
 
 # --- Backend URL ---
-BACKEND_URL = "https://lexsy-ai-swe-backend.onrender.com" 
+#BACKEND_URL = "http://127.0.0.1:8000"  # Local backend
+BACKEND_URL = "https://lexsy-ai-swe-backend.onrender.com"  # Production backend 
 
 def send_request_with_auth(endpoint, **kwargs):
     """Helper to attach API key if available."""
